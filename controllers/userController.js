@@ -185,13 +185,13 @@ const updateDetails = async function (req, res) {
         }
 
         // Extract params
-        let { fname, lname, email, phone, password } = requestBody;
+        let { fname, lname, email, phone } = requestBody;
 
         fname = fname.trim()
         lname = lname.trim()
         email = email.trim()
         phone = phone.trim()
-        password = password.trim()
+       // password = password.trim()
 
 
         let obj = {}
@@ -225,10 +225,10 @@ const updateDetails = async function (req, res) {
             //already present, VALID(done)
             obj['phone'] = phone
         }
-        if (validator.isValidString(password)) {
-            const encrypt = await bcrypt.hash(password, 10)
-            obj['password'] = encrypt
-        }
+        // if (validator.isValidString(password)) {
+        //     const encrypt = await bcrypt.hash(password, 10)
+        //     obj['password'] = encrypt
+        // }
 
         const updatedUserData = await userModel.findOneAndUpdate({ _id: userId }, obj, { new: true })
 

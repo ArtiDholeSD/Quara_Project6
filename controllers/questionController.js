@@ -1,20 +1,29 @@
-// const blogModel = require("../models/blogModel")
-// const AuthorModel = require("../models/authorsModel")
+const blogModel = require("../models/blogModel")
+const AuthorModel = require("../models/authorsModel")
+const jwt = require("jsonwebtoken");
+const userModel = require("../models/userModel");
+const validator = require('../utils/validator');
 
-// //Q2
-// const createBlog = async function (req, res) {
-//     try {
-//         if(req.body.authorId==req.validToken._id){
-//             let savedData=await blogModel.create(req.body)
-//             res.status(200).send({status:true,data:savedData})
-//         }else(
-//             res.status(404).send({status:false,msg:"provide your authorId"})
-//         )
-//     } catch (error) {
-//         console.log(error)
-//         res.status(400).send({ status: false, msg: "server error" })
-//     }
-// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
