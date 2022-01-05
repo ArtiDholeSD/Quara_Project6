@@ -1,11 +1,41 @@
-const blogModel = require("../models/blogModel")
-const AuthorModel = require("../models/authorsModel")
+
+const questionModel = require("../models/questionModel")
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 const validator = require('../utils/validator');
 
 
+const CreateQuestion = async function (req, res) {
+    try {
+        if (!validator.isValidRequestBody(req.body)) {
+            return res.status(400).send({ status: false, message: 'Invalid request Parameters. Please provide User Details' })
+        }
+        let { description, tag, askedBy, deletedAt, isDeleted } = req.body
+        // validation
+        if (!validator.isValid(description)) {
+            return res.status(400).send({ status: false, message: `${description} is required` })
+        }
+        if (!validator.isValid(tag)) {
+            return res.status(400).send({ status: false, message: `${tag} is required` })
+        }
+      
+      
+     
+        { description, tag, askedBy, deletedAt, isDeleted }
+        const newQuestion = await questionModel.create(userData);
+        return res.status(201).send({ status: true, message: `Question created successfully`, data: newQuestion })
 
+    } catch (e) {
+        return res.status(500).send({ status: false, message: e.message })
+    }
+
+}
+
+
+module.exports=
+{
+    CreateQuestion
+}
 
 
 
