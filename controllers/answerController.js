@@ -28,7 +28,7 @@ const createAnswer =async function(req,res){
             return res.atstus(400).send({status:false,message:"provide Answer"})
         }
         if (!validator.isValidObjectId(questionId)) {
-            return res.status(400).send({ status: false, message: `Correct  userId is required` })
+            return res.status(400).send({ status: false, message: `Correct  questionId is required` })
         }
 
         const question= await questionModel.findOne({_id:questionId,isDeleted:false})
