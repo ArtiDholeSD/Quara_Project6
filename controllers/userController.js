@@ -25,6 +25,7 @@ const registerUser = async function (req, res) {
         if (presentEmail) {
             return res.status(400).send({ status: false, message: `${email} is already Present` })
         }
+        //check again
         if (!validator.isValidNumber(phone)) {
             return res.status(400).send({ status: false, message: `${phone} should be valid  Indian Mobile Number` })
         }
@@ -35,12 +36,12 @@ const registerUser = async function (req, res) {
        // password = password.trim()
        
         if (!validator.isValid(password)) {
-            return res.status(400).send({ status: false, message: `Password is required` })
+            return res.status(400).send({ status: false, message: `password is required` })
         }
         password = password.trim()
 
         if (!validator.isValidLength(password, 8, 15)) {
-            return res.status(400).send({ status: false, message: `Password length must be between 8 to 15 char long` })
+            return res.status(400).send({ status: false, message: `password length must be between 8 to 15 char long` })
         }
         fname = fname.trim()
         lname = lname.trim()
@@ -157,9 +158,7 @@ const updateDetails = async function (req, res) {
         const userId = params.userId  //req.params.userId
         console.log(userId)
         const userIdFromToken = req.userId
-
-
-
+        
         if (!validator.isValidObjectId(userId)) {
             res.status(400).send({ status: false, message: `${userId} is not a valid user id` })
             return

@@ -4,7 +4,7 @@ const mongoose = require('mongoose')
 
 
 const re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-const  reNumber = /\d+/
+const  reNumber = /^[6-9]\d{9}$/;
 //const reNumber = "(\+91)?(-)?\s*?(91)?\s*?(\d{3})-?\s*?(\d{3})-?\s*?(\d{4})";
 const checkMinMax=/^.{8,15}$/;
 

@@ -5,10 +5,13 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 const questionSchema = new mongoose.Schema(
     {
         description: { type: String, required: true },
-        tags: [String],
+        tags:  [{
+            type: String
+        }], //gievn as not required
         askedBy: { 
             type: ObjectId,
             required: true,
+            trim:true,
             ref: "QuaraUser" }, //a referenec to user collection
 
         isDeleted: { type: Boolean, default: false },
