@@ -29,7 +29,8 @@ const userSchema=new mongoose.Schema({
         trim:true,
         //minlength:8,
         //maxlength:15
-    }
+    },
+    creditScore: {type:Number, required:true, default:500},
 }, {timestamps: true} )
 
 

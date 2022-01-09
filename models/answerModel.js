@@ -1,8 +1,7 @@
 const mongoose = require('mongoose')
 
 const ObjectId=mongoose.Schema.Types.ObjectId
-const answerSchema= new mongoose.Schema({
-    
+const answerSchema= new mongoose.Schema({  
     answeredBy: {
     type:ObjectId, 
     ref:"QuaraUser",
@@ -23,7 +22,9 @@ const answerSchema= new mongoose.Schema({
 
 },{timestamps:true});
 
-module.exports = mongoose.model("quoraAnswer",answerSchema);
+module.exports = mongoose.model("quoraAnswer",answerSchema);  
+
+//converting answerSchema into model(quoraAnswers)
 
 
 

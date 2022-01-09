@@ -26,13 +26,15 @@ const registerUser = async function (req, res) {
             return res.status(400).send({ status: false, message: `${email} is already Present` })
         }
         //check again
-        if (!validator.isValidNumber(phone)) {
+        if(phone){
+        if (!validator.isValidNumber(phone.trim())) {
             return res.status(400).send({ status: false, message: `${phone} should be valid  Indian Mobile Number` })
         }
         const presentPhone = await userModel.findOne({ phone: phone })
         if (presentPhone) {
             return res.status(400).send({ status: false, message: `${phone} is already Present` })
         }
+       }
        // password = password.trim()
        
         if (!validator.isValid(password)) {
@@ -46,7 +48,7 @@ const registerUser = async function (req, res) {
         fname = fname.trim()
         lname = lname.trim()
         email = email.trim()
-        phone = phone.trim()
+      
       
 
         //encrypting password

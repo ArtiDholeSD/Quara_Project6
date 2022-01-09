@@ -13,7 +13,7 @@ const createAnswer =async function(req,res){
             return res.status(400).send({ status: false, message: 'Invalid request Parameters. Please provide User Details' })
         }
         let { userId,text,questionId} = req.body
-        console.log(userId)
+        //console.log(userId)
         // validation
         if (!validator.isValidObjectId(userId)) {
             return res.status(400).send({ status: false, message: `Correct  userId is required` })
@@ -28,22 +28,28 @@ const createAnswer =async function(req,res){
             return res.atstus(400).send({status:false,message:"provide Answer"})
         }
         if (!validator.isValidObjectId(questionId)) {
-            return res.status(400).send({ status: false, message: `Correct  questionId is required` })
+            return res.status(400).send({ status: false, message: `Correct  userId is required` })
         }
 
         const question= await questionModel.findOne({_id:questionId,isDeleted:false})
         if(!question){
             return res.status(400).send({ status: false, message: `Question is either deleted or not present` })
         }
-
+        console.log(question)
         //authentication user
         if (userId !== userIdFromToken) {
             return res.status(401).send({ status: false, message: `Unauthorized access! Owner info doesn't match` });
         }
-        // user can't answer his own answer  ----------------- { but user can give answer to his/her answer on qura}
-        // if (userId === answer.askedBy) {
-        //     return res.status(401).send({ status: false, message: `user can't answer his own answer` });
-        // }
+        // user can't answer his own Question  ----------------- { but user can give answer to his/her answer on qura}
+        console.log(typeof userId)//------str
+        console.log(typeof question.askedBy.toString())//-------obj ->str
+        console.log( userId)//------str
+        console.log( question.askedBy.toString())//-------obj ->str
+        if (userId === question.askedBy.toString()) {
+            return res.status(401).send({ status: false, message: `user can't answer his own Question` });
+        }
+        user.creditScore=user.creditScore+200;
+        await user.save()
 
         const  answerData= { answeredBy:userId,text,questionId}
         const newanswer = await answerModel.create(answerData);
@@ -66,7 +72,8 @@ const getQuestionById = async function (req, res) {  //(public api)
         if(!question){
             return res.status(400).send({ status: false, message: `Question is either deleted or not present` })
         }
-        const answer =await answerModel.find({questionId:questionId,isDeleted:false})
+          //for sorting most recent answers
+        const answer =await answerModel.find({questionId:questionId,isDeleted:false}).sort({createdAt:-1});
         if(!answer){
             return res.status(400).send({ status: false, message: `answer is either deleted or not present` })
         }

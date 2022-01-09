@@ -62,6 +62,18 @@ const CreateQuestion = async function (req, res) {
           message: `Unauthorized access! Owner info doesn't match`,
         });
     }
+    //credit code deduction
+    if(user.creditScore==0)
+    {
+      return res
+        .status(400)
+        .send({
+          status: false,
+          message: `You can not post Question (Your CreditScore : 0), In order to post question ,Please given answer of Any question you know , To get (creditscore : 200)`,
+        });
+    }
+    user.creditScore = user.creditScore - 100;
+    await user.save()
 
     questionData = { description, tags, askedBy, isDeleted };
     const newQuestion = await questionModel.create(questionData);
@@ -87,157 +99,146 @@ You should be able to filter the result if the a query parameter like tag=advent
 */
 const getQuestions = async function (req, res) {
   try {
-    const filterQuery = { isDeleted: false }; //complete object details.
+    const searchFilter={ isDeleted:false } //store all filters
     const queryParams = req.query;
+    
+   const Questions = await questionModel.find({isDeleted: false})
+      async  function finalArray (getQuestion) {
+       try{ 
+        let arr = [];
+        console.log(getQuestion)
+     
+                for (let i = 0; i < getQuestion.length; i++) {
+                  let getQuestionId = getQuestion[i]._id;
+                  // console.log(getQuestionId)
+                  //for sorting most recent answers
+                  let getAnswer = await answerModel.find({ questionId: getQuestionId, isDeleted: false}).sort({createdAt:-1});
+                  console.log(getAnswer)
+                  //getting all answers for id(0),id(1),.....so on
+                    answers = getAnswer.map((element) => element.text);      
+                  //featching textfields from answers for getQuestionId id(0),id(1),.....so on
+              
+                  //if(answers.length !== 0){
+                  arr.push(getQuestion[i]);
+                  arr.push(answers);
+                  // }
+                }
+                console.log(arr)
+                  //verifying is it an array and having some data in that array.
+                   if (Array.isArray(arr) && arr.length === 0) {
+                     return res.status(404).send({ Status: false, message: "No data found" });
+                   }
+                 console.log(arr)
+          return arr
+
+        } catch (error) {
+          return res.status(500).send({ success: false, error: error.message });
+        }
+       }
+ 
+        
+ 
 
     if (validator.isValidRequestBody(queryParams)) {
-      const { tag, sort, questionId, description } = queryParams;
-
-      //validation starts.
-      if (validator.isArray(tag)) {
-        filterQuery["tags"] = tag;
+        const { tag, sort, questionId, description } = queryParams;
+        if(tag){
+        if (!validator.isValid(tag)) {
+          return res
+            .status(400)
+            .send({ status: false, message: `provide valid search word for tag` });
+        }
       }
-
-      //using $regex to match the subString of the descriptions  & "i" for case insensitive.
-      if (validator.isValid(description)) {
-        filterQuery["description"] = {};
-        filterQuery["description"]["$regex"] = description;
-        filterQuery["description"]["$options"] = "i";
-      }
-
-      if (validator.isValidObjectId(questionId)) {
-        filterQuery["_id"] = questionId;
-      }
-
-      if (validator.isValid(sort)) {
-        const ascending = 1;
-        const descending = -1;
-
-        if (!(sort == "ascending" || sort == "descending")) {
+        if(description){
+        if (!validator.isValid(description)) {
+          return res
+            .status(400)
+            .send({ status: false, message: `provide valid search word` });
+        }}
+        if(questionId){
+        if (!validator.isValidObjectId(questionId)) {
           return res
             .status(400)
             .send({
               status: false,
-              message: `sort should be 'ascending' or 'descending' `,
+              message: `Correct ${questionId} should be`,
             });
-        }
-
-        if (sort == ascending) {
-          const getQuestion = await questionModel
-            .find(filterQuery)
-            .sort({ createdAt: 1 });
-
-          let arr = [];
-          let answers = [];
-
-          for (let i = 0; i < getQuestion.length; i++) {
-            let getQuestionId = getQuestion[i]._id;
-            // console.log(getQuestionId)
-            let getAnswer = await answerModel.find({
-              questionId: getQuestionId,
-              isDeleted: false,
-            }); //getting all answers for id(0),id(1),.....so on
-            answers = getAnswer.map((element) => element.text); //featching textfields from answers for getQuestionId id(0),id(1),.....so on
-
-            // if(answers.length !== 0){
-            arr.push(getQuestion[i]);
-            arr.push(answers);
-            // }
+            }
           }
-
-          //verifying is it an array and having some data in that array.
-          if (Array.isArray(arr) && arr.length === 0) {
-            return res
-              .status(404)
-              .send({ Status: false, message: "No data found" });
-          }
-
-          return res
-            .status(200)
-            .send({
-              status: true,
-              meassage: "successfully featched data",
-              data: arr,
-            });
-        }
-        if (sort == descending) {
-          const getQuestion = await questionModel
-            .find(filterQuery)
-            .sort({ createdAt: -1 });
-
-          let arr = [];
-          let answers = [];
-
-          for (let i = 0; i < getQuestion.length; i++) {
-            let getQuestionId = getQuestion[i]._id;
-            // console.log(getQuestionId)
-            let getAnswer = await answerModel.find({
-              questionId: getQuestionId,
-              isDeleted: false,
-            }); //getting all answers for id(0),id(1),.....so on
-            answers = getAnswer.map((element) => element.text); //featching textfields from answers for getQuestionId id(0),id(1),.....so on
-
-            //if(answers.length !== 0){
-            arr.push(getQuestion[i]);
-            arr.push(answers);
-            // }
-          }
-
-          //verifying is it an array and having some data in that array.
-          if (Array.isArray(arr) && arr.length === 0) {
-            return res
-              .status(404)
-              .send({ Status: false, message: "No data found" });
-          }
-
-          return res
-            .status(200)
-            .send({
-              status: true,
-              meassage: "successfully featched data",
-              data: arr,
-            });
-        }
-      }
-    }
-
-    const getQuestion = await questionModel.find(filterQuery);
+            
   
-    let arr = [];
-    let answers = [];
+            // if(questionId){
+            //   if(validator.isValidObjectId(questionId))
+            //   {  
+            //     let getQuestion = await questionModel.find({_id:questionId},searchFilter)
+            //     const arr = await finalArray(getQuestion)
+            //    return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
+            //    }
+            //  }
+      
+     
+           if(sort){
+                 if(!((sort == 'descending') || (sort == 'ascending'))) {
+                      return res.status(400).send({ status: false, message: `Sort should be descending or ascending ` })
+                   }
+              }
+           
+          
+          if(sort=='descending'){
+              let getQuestion = await questionModel.find({$or:[{_id:questionId},{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }]} ,searchFilter).sort({createdAt:-1});
+              
+              console.log(getQuestion)
 
-    for (let i = 0; i < getQuestion.length; i++) {
-      let getQuestionId = getQuestion[i]._id;
-      // console.log(getQuestionId)
-      let getAnswer = await answerModel.find({
-        questionId: getQuestionId,
-        isDeleted: false,
-      }); //getting all answers for id(0),id(1),.....so on
-      answers = getAnswer.map((element) => element.text); //featching textfields from answers for getQuestionId id(0),id(1),.....so on
+              const arr = await finalArray(getQuestion)
+              return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
+          
+           }else {    
+                 
+               let getQuestion = await questionModel.find({$or:[{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }]} ,searchFilter).sort({createdAt:1});
+               const arr = await finalArray(getQuestion)
+               return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
+           }
 
-      //if(answers.length !== 0){
-      arr.push(getQuestion[i]);
-      arr.push(answers);
-      // }
-    }
 
-    //verifying is it an array and having some data in that array.
-    if (Array.isArray(arr) && arr.length === 0) {
-      return res.status(404).send({ Status: false, message: "No data found" });
-    }
-    console.log(arr)
 
-    return res
-      .status(200)
-      .send({
-        status: true,
-        meassage: "successfully featched data",
-        data: arr,
-      });
+          //  const descending=-1
+          //  if(sort==descending){
+          //   let getQuestion = await questionModel.find({$or:[{_id:questionId},{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }]} ,searchFilter).sort({createdAt:-1});
+          //   const arr = await finalArray(getQuestion)
+
+          //   arr.sort(function(a, b) {
+          //     var c = new Date(a.createdAt);
+          //     var d = new Date(b.createdAt);
+          //     return c-d;
+          // });
+
+          //   return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
+          //  }
+
+
+
+          // let getQuestion = await questionModel.find({$or:[{_id:questionId},{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }]} ,searchFilter).sort({createdAt:1});
+          //   const arr = await finalArray(getQuestion)
+         
+          //   return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });     
+       }
+               
+       
+
+
+  
+        
+      const arr = await finalArray(Questions);
+      return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
+      // let getQuestion = await questionModel.find({$or:[{tags:tag},{_id:questionId},{ 'description': { $regex: `${description}`, $options: "$i" } }]},{isDeleted:false}).sort({createdAt:-1})
+      //  if( ( (description && tag )||tag||description)  )
+      
+  
   } catch (error) {
     return res.status(500).send({ success: false, error: error.message });
   }
-};
+}
+
+
 
 // const getQuestions = async function (req, res) {  //(public api)
 //     try {
@@ -339,7 +340,8 @@ const getQuestionById = async function (req, res) {
           message: `Question is either deleted or not present`,
         });
     }
-    const answer = await answerModel.find({ questionId: questionId });
+    //for sorting most recent answers
+    const answer = await answerModel.find({ questionId: questionId,isDeleted:false}).sort({createdAt:-1});
     if (!answer) {
       return res
         .status(400)
