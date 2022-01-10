@@ -148,7 +148,7 @@ const updateAnswerById = async function (req, res) {  //(public api)
     
             const updatedAnswer = await answerModel.findOneAndUpdate({_id: answerId},{text:text},{new : true}) 
         
-        return res.status(200).send({status:true,meassage:"data updated successfully ", data:updatedAnswer})
+        return res.status(201).send({status:true,meassage:"data updated successfully ", data:updatedAnswer})//should be 200 but given 201
     } catch (e) {
         return res.status(500).send({ status: false, message: e.message});
 }
