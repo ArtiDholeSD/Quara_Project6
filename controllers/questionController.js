@@ -48,7 +48,7 @@ const CreateQuestion = async function (req, res) {
     console.log(user);
     if (!user) {
       return res
-        .status(400)
+        .status(401)
         .send({ status: false, message: `user is not present` });
     }
     //console.log(typeof askedBy)--str
@@ -99,7 +99,7 @@ You should be able to filter the result if the a query parameter like tag=advent
 */
 const getQuestions = async function (req, res) {
   try {
-    const searchFilter={ isDeleted:false } //store all filters
+   // const searchFilter={ isDeleted:false } //store all filters
     const queryParams = req.query;
     
    const Questions = await questionModel.find({isDeleted: false})
@@ -126,7 +126,7 @@ const getQuestions = async function (req, res) {
                 console.log(arr)
                   //verifying is it an array and having some data in that array.
                    if (Array.isArray(arr) && arr.length === 0) {
-                     return res.status(404).send({ Status: false, message: "No data found" });
+                     return res.status(400).send({ Status: false, message: "No data found" });
                    }
                  console.log(arr)
           return arr
@@ -165,26 +165,16 @@ const getQuestions = async function (req, res) {
             }
           }
             
-  
-            // if(questionId){
-            //   if(validator.isValidObjectId(questionId))
-            //   {  
-            //     let getQuestion = await questionModel.find({_id:questionId},searchFilter)
-            //     const arr = await finalArray(getQuestion)
-            //    return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
-            //    }
-            //  }
-      
-     
            if(sort){
-                 if(!((sort == 'descending') || (sort == 'ascending'))) {
+                 if(!((sort === 'descending') || (sort === 'ascending'))) {
                       return res.status(400).send({ status: false, message: `Sort should be descending or ascending ` })
                    }
               }
-           
+             
+         
           
-          if(sort=='descending'){
-              let getQuestion = await questionModel.find({$or:[{_id:questionId},{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }]} ,searchFilter).sort({createdAt:-1});
+          if(sort==='descending'){
+              let getQuestion = await questionModel.find({$or:[{_id:questionId},{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } } , {isDeleted: false}]} ).sort({createdAt:-1});
               
               console.log(getQuestion)
 
@@ -193,7 +183,7 @@ const getQuestions = async function (req, res) {
           
            }else {    
                  
-               let getQuestion = await questionModel.find({$or:[{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }]} ,searchFilter).sort({createdAt:1});
+               let getQuestion = await questionModel.find({$or:[{ description: { $regex: `${description}`, $options: "$i" } },{ tags: { $regex: `${tag}`, $options: "$i" } }, {isDeleted: false}]}).sort({createdAt:1});
                const arr = await finalArray(getQuestion)
                return res.status(200).send({status: true, meassage: "successfully featched data", data: arr });
            }

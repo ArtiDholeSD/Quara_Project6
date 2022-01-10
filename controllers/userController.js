@@ -172,7 +172,7 @@ const updateDetails = async function (req, res) {
 
         const user = await userModel.findOne({ _id: userId })
         if (!user) {
-            return res.status(404).send({ status: false, message: `user not found` })
+            return res.status(401).send({ status: false, message: `user not found` })
         }
 
         if (userId.toString() !== userIdFromToken) {
