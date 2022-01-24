@@ -10,7 +10,6 @@
 
 #### Project conventions
 
-- You must submit an explainer video at the end of each day, and not at the end of a feature on an individual basis. If you work for say 8 days in total at this project, there should be 8 videos submitted by you at the end of each day mandatorily.
 - In this project also we will work feature wise. That means we pick one resource/ sub-resource like user, answer, question, etc at a time. All the apis on one specific resource would come under one feature. The steps would be:
   1) We create it's model.
   2) We build it's APIs.
